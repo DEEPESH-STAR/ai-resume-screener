@@ -1,0 +1,16 @@
+{
+  "name": "matchline-ai-resume-screener",
+  "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Privacy-first resume evidence review with optional browser AI",
+  "scripts": {
+    "test": "node --test --test-concurrency=1 tests/core.test.js tests/functional.test.js",
+    "test:unit": "node --test tests/core.test.js",
+    "test:functional": "node --test tests/functional.test.js",
+    "test:live": "node tests/run-live.js"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}
