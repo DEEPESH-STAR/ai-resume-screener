@@ -1,0 +1,40 @@
+name: Live integrations and browser compatibility
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  live:
+    name: Real documents and AI (${{ matrix.browser }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    env:
+      TEST_BROWSER: ${{ matrix.browser }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm install --ignore-scripts --no-audit --no-fund
+      - run: npx playwright install --with-deps ${{ matrix.browser }}
+      - name: Core and functional regression tests
+        run: npm test
+      - name: Real model inference and PDF/DOCX parsing (no mocks)
+        env:
+          RUN_LIVE: '1'
+        run: npm run test:live
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: live-results-${{ matrix.browser }}
+          path: test-results/
+          if-no-files-found: ignore
